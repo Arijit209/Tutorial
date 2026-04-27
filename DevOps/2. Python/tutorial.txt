@@ -1,0 +1,46 @@
+# Hello world print show
+print('hello world')
+
+# input and output show
+value = input("please input a number: ")
+print('value is',value)
+
+# single line comment write
+'''
+Multi line block comment
+'''
+
+# variable declare
+a = 10
+b = 20
+sum = a + b
+print("My sum number is", sum)
+
+# variable data type
+'''
+integer -> int
+floating number -> float, double
+character -> char
+string -> string
+boolean -> bool
+'''
+
+# Integer
+myInt = 10
+print('Integer', myInt)
+
+# Float
+myFloat = 3.14
+print('Float', myFloat)
+
+# Character
+myChar = 'A'
+print('Character', myChar)
+
+# String
+myString = 'Hello world, 112'
+print('String', myString)
+
+# Boolean
+myBool = True
+print('Boolean', myBool)
