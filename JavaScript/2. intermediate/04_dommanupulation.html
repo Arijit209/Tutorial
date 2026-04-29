@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- <h1 id="demo" class="demo">Arijit Dutta</h1> -->
+
+    <!-- <p id="content">Old text</p>
+    <img id="logo" src="https://picsum.photos/200/300" alt="image">
+    <a id="link" href="https://www.google.com" target="_blank">Google</a> -->
+
+    <!-- <div id="container">
+        <button onclick="addButton()">Add Me</button>
+        <button onclick="removeButton()">Remove Me</button>
+
+    </div> -->
+
+    <!-- <button id="clickme">click me</button> -->
+
+    <!-- This is Event -->
+    <!-- <button onclick="alert('tell me')">click me</button> -->
+
+    <!-- This is Inline Event  -->
+    <!-- <button onclick="sayHello()">click me</button> -->
+
+    <!-- Event Bubbling -->
+    <!-- <div id="parent-div">
+        <button id="child-div">Click Me</button>
+    </div> -->
+
+    <!-- Event Deligation -->
+    <div>
+        <ul id="parent-ul">
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+            <li>Item 4</li>
+        </ul>
+    </div>
+    <script>
+        // console.log(document.body.firstChild.nextSibling)
+        // console.log(document.getElementById('demo'))
+        // console.log(document.getElementsByClassName('demo'))
+        // console.log(document.getElementsByTagName('h1'))
+        // console.log(document.querySelector('#demo'))
+        // console.log(document.querySelectorAll('.demo'))
+
+        // Dom Manupulation
+        // document.getElementById('content').innerText = 'New World'
+        // document.getElementById('content').innerHTML = '<b>Hello World</b>'
+        // document.getElementById('link').href = 'https://www.youtube.com'
+        // document.getElementById('link').innerText = 'Youtube'
+
+        // Adding and removing elements
+        // function addButton() {
+        //     const box = document.createElement('div');
+        //     box.innerText = 'Click Me'
+        //     box.id = 'box'
+        //     document.getElementById('container').appendChild(box)
+        // }
+
+        // function removeButton() {
+        //     const container = document.getElementById('container')
+        //     if (container.lastChild) {
+        //         container.removeChild(container.lastChild)
+        //     }
+        // }
+
+        // Event Listener
+        
+        // Not recomended
+        // function sayHello() {
+        //     alert('hello')
+        // }
+
+        // Not recomended
+        // document.getElementById('clickme').onclick = function() {
+        //     alert('hi')
+        // }
+
+        // Recomended
+        // document.getElementById('clickme').addEventListener('click', function() {
+        //     alert('hi')
+        // })
+
+        // Event Bubbling
+        // const parent = document.getElementById('parent-div')
+        // const child = document.getElementById('child-div')
+
+        // parent.addEventListener('click', function(){
+        //     console.log('Parent Portion')
+        // })
+        // child.addEventListener('click', function(){
+        //     console.log('Child Portion')
+        // })
+
+        // Event Deligation
+        const parentul = document.getElementById('parent-ul')
+        parentul.addEventListener('click', function(event) {
+            if (event.target.tagName === 'LI') {
+                console.log('list item clicked', event.target.textContent)
+            }
+        })
+
+        
+    </script>
+</body>
+</html>

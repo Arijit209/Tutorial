@@ -20,7 +20,7 @@ let fruits2 = ['apple', 'banana', 'orange']
 fruits2.shift()
 console.log(fruits2);
 
-// 4. Shift (add to first)
+// 4. Unshift (add to first)
 let fruits3 = ['apple', 'banana', 'orange']
 fruits3.unshift('mango', 'kiwi')
 console.log(fruits3);

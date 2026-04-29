@@ -66,7 +66,7 @@ console.log(str7.split(" "))
 let str8 = " Arijit Dutta "
 console.log(str8.trim()) 
 
-// 9. Trim
+// 10. Concat
 let str91 = "Arijit"
 let str92 = "Dutta"
 console.log(str91.concat(str92)) 
