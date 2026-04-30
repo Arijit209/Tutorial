@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+</head>
+<body>
+    <h1>Arijit Decodes</h1>
+    <p id="demo">This is a paragraph.</p>
+    <script>
+        // This code is not optimized as we are accessing the DOM twice.
+        // document.getElementById("demo").style.color = "red";
+        // document.getElementById("demo").style.fontSize = "20px";
+
+        // Optimized code:
+        const myDiv = document.getElementById("demo");
+        myDiv.style.color = "blue";
+        myDiv.style.fontSize = "30px";
+    </script>
+    
+</body>
+</html>

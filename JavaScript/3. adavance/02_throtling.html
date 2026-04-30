@@ -1,0 +1,33 @@
+<!--
+    =========================================================Throttling============================================
+    The throttle function ensures that the fetchData function is called at most once every 500 milliseconds, 
+    regardless of how many times the input event is triggered.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Throttling</title>
+</head>
+<body>
+    <h1>Scroll page down to see the Throttling in action</h1>
+    <script>
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+        function handleScroll() {
+            console.log('Scroll event triggered', new Date().toLocaleTimeString());
+        }
+        const throttleFile = throttle(handleScroll, 1000);
+        window.addEventListener('scroll', throttleFile);
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!--
+    =========================================================Debouncing============================================
+    after 500ms of inactivity, the fetchData function will be called with the latest input value. 
+    This helps to reduce the number of API calls or expensive operations that may occur when a user is typing rapidly.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debouncing</title>
+</head>
+<body>
+    <input type="text" id="search" placeholder="Type to search...">
+    <script>
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+        const fetchData = (event) => {
+            console.log('Fetching data for:', event.target.value);
+        };
+        const debounceField = debounce(fetchData, 500);
+        document.getElementById('search').addEventListener('input', debounceField);
+    </script>
+</body>
+</html>
