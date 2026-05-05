@@ -26,7 +26,6 @@ for i in a.values():
     print(i)
 
 ## Method
-## Method
 '''
 clear                -> a.clear() (clear all data)
 copy                 -> a.copy() (shallow copy mean if change one not change another)
