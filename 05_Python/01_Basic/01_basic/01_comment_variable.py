@@ -7,3 +7,7 @@ Multi line block comment, This is doc string
 UserName = 'Arijit' #pascal case
 userAge = 'Arijit' #camel case
 user_name = 'Arijit' #snake case
+
+print(UserName)
+print(userAge)  
+print(user_name)
