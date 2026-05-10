@@ -24,3 +24,8 @@ intersection         -> a.intersection(b) or a&b (show only common element)
 difference           -> a.difference(b) or a-b (diffrence value a from b)
 semmetric difference -> a.symmetric_difference(b) or a^b (remove common part only and take others)
 '''
+
+print(a|b)
+print(a&b)
+print(a-b)
+print(a^b)

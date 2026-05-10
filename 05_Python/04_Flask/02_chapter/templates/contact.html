@@ -1,0 +1,12 @@
+{% extends 'layouts/main.html' %}
+{% block title %} Contact {% endblock %}
+{% block content%}
+    <h1>This is my Contact Page</h1>
+    <form action="/submit" method="post">
+        <input type="text" name="username" placeholder="username">
+        <br><br>
+        <input type="password" name="password" placeholder="*******">
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}

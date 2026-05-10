@@ -1,0 +1,12 @@
+{% extends 'layouts/main.html' %}
+{% block title %} Success {% endblock %}
+{% block content%}
+    <h1>This is my About page</h1>
+    {% with messages = get_flashed_messages(with_categories = true) %}
+        {% if messages %}
+            {% for category,message in messages %}
+                <p style="color: green;">{{message}}</p>
+            {% endfor%}
+        {% endif %}
+    {% endwith %}
+{% endblock %}

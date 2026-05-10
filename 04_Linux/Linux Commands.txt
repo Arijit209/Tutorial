@@ -1,0 +1,73 @@
+Linux All Commands
+
+1. ls                                     -> show folders and files
+2. ls -al                                 -> show folders and files with details
+3. clear                                  -> clear the screen
+4. pwd                                    -> print working directory
+5. cd                                     -> change directory
+6. cd ..                                  -> go back/previous one directory
+7. cd -                                   -> go back last directory
+8. mkdir                                  -> make a directory
+9. touch                                  -> create a new file
+10. mv source destination                 -> move folder or file one destination to another folder destination
+11. ls folder_name                        -> show all folders and files under that particular folder
+12. mv source destination                 -> also use for rename like (mv file1.txt file2.txt)
+13. cp source destination                 -> copy folder or file one destination to another folder destination
+14. rm file_name                          -> remove the file
+15. rm -rf folder_name                    -> remove the folder (-rf means recursive force)
+16. cat file_name                         -> content show in the file
+17. ln source destination                 -> create a hard link from the source file, If one is deleted, the other still works
+18. ln -s source destination              -> create a soft link from the source file pointer/shortcut, If original is deleted → link becomes broken
+19. echo                                  -> print any text that follows the command
+20. man                                   -> system generated manual
+21. uname                                 -> kernel name
+22. uname -mrs                            -> version of the kernel system
+23. uname -help                           -> uname all options
+24. whoami                                -> get the active user
+25. tar -cvf foledr_name.tar folder       -> create a compress folder just like zip and rar
+26. tar -xvf foledr_name.tar              -> extracting a compress folder
+27. cat file_name | grep var_name         -> find the variable in the file
+28. cat file_name | grep var_name -n      -> find the variable in the file with line number
+29. head file_name                        -> first few lines show
+30. head -n 5 file_name                   -> first 5 lines show
+31. tail file_name                        -> last few lines show
+32. tail -n 5 file_name                   -> last 5 lines show
+33. printenv                              -> show the all environment variables
+34. echo $HOME                            -> show name of the home variable which already set in the environment
+35. export name=arijit                    -> we set the value into the environment variable
+36. zip archive.zip file.txt              -> zip a single file
+37. zip archive.zip file1.txt file2.jpg   -> zip multiple files
+38. zip -r archive.zip folder_name/       -> zip a directory (recursive)
+39. zip -e archive.zip file.txt           -> create a password-protected zip
+40. zip -u archive.zip new_file.txt       -> update an existing zip with new files
+41. zip -d archive.zip file_to_remove.txt -> delete a file from an existing zip
+42. unzip archive.zip                     -> extract to the current directory
+43. unzip archive.zip -d /path/to/dest/   -> extract to a specific destination of the directory
+44. unzip -l archive.zip                  -> list contents without extracting
+45. unzip -o archive.zip                  -> overwrite existing files without prompting
+46. unzip -t archive.zip                  -> test if a zip file is corrupted
+47. services --status-all                 -> show the all services with status
+48. ps                                    -> show current running services
+49. ps aux                                -> all the services running in my sysetem with details
+50. kill ps_id                            -> kill the process id
+51. df                                    -> storage device of the file system
+52. chmod                                 -> file or folder permission
+53. ifconfig                              -> display your network status
+54. wget                                  -> this use for install file to linux
+55. curl                                  -> http request in the terminel
+56. apt                                   -> install any software or packages
+57. sudo                                  -> run for the administrator
+58. sudo apt update                       -> update the packages
+59. sudo apt upgrade                      -> upgrade the packages
+60. sudo apt remove package_name          -> uninstall package
+61. sudo apt install package_name         -> install package
+62. alias c='clear'                       -> c now the clear the terminal
+63. whereis package                       -> found the path
+64. whatis package                        -> what the package do
+65. top                                   -> just like task manager
+66. btop                                  -> same but show better
+67. neofetch                              -> install before use this, use for system configuration show
+68. sudo snap                             -> similar to apt, apt for linux, snap for ubuntu
+
+
+
