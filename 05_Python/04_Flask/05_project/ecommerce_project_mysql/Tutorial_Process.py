@@ -6,4 +6,5 @@
     5. pip install flask flask-wtf flask-sqlalchemy flask-login pymysql email-validator
     6. pip freeze > requirements.txt
     7. pip install pillow
+    8. pip install flask-jwt-extended
 '''
