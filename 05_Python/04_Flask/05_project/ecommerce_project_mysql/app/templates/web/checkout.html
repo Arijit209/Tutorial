@@ -1,0 +1,152 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+Checkout
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Checkout 🛍
+</h2>
+
+<div class="row">
+
+    <!-- ADDRESS -->
+    <div class="col-md-7">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-dark text-white">
+
+                <h4>
+                    Shipping Address
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    <div class="mb-3">
+
+                        <label>
+                            Delivery Address
+                        </label>
+
+                        <textarea
+                            name="address"
+                            rows="5"
+                            class="form-control"
+                            required
+                        ></textarea>
+
+                    </div>
+
+                    <button
+                        class="btn btn-success"
+                    >
+                        Place Order
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div class="col-md-5">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-primary text-white">
+
+                <h4>
+                    Order Summary
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                {% for item in cart_items.values() %}
+
+                <div class="mb-3">
+
+                    <h5>
+
+                        {{ item.name }}
+
+                    </h5>
+
+                    <p>
+
+                        ₹ {{ item.price }}
+                        ×
+                        {{ item.quantity }}
+
+                    </p>
+
+                </div>
+
+                <hr>
+
+                {% endfor %}
+
+                <div class="d-flex justify-content-between">
+
+                    <h5>
+                        Subtotal
+                    </h5>
+
+                    <h5>
+                        ₹ {{ subtotal }}
+                    </h5>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+
+                    <h5>
+                        GST (18%)
+                    </h5>
+
+                    <h5 class="text-warning">
+
+                        ₹ {{ gst }}
+
+                    </h5>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+
+                    <h4>
+                        Total Amount
+                    </h4>
+
+                    <h4 class="text-success">
+
+                        ₹ {{ final_total }}
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
