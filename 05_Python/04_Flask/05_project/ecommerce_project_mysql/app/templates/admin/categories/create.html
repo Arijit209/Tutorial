@@ -1,0 +1,98 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Create Category
+{% endblock %}
+
+{% block page_title %}
+Create Category
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card card-box">
+
+                <div class="card-header bg-dark text-white">
+
+                    <h5>
+
+                        Add New Category
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <!-- CATEGORY FORM -->
+                    <form method="POST">
+
+                        <!-- CATEGORY NAME -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Category Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                placeholder="Enter Category Name"
+                                required
+                            >
+
+                        </div>
+
+                        <!-- SUBMIT BUTTON -->
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+
+                                <i class="fa fa-plus"></i>
+
+                                Create Category
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="card-footer text-center">
+
+                    <a
+                        href="{{ url_for('admin.categories') }}"
+                        class="btn btn-secondary"
+                    >
+
+                        <i class="fa fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

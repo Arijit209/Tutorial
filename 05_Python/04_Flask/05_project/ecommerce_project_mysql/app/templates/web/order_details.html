@@ -1,0 +1,374 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+Order Details
+{% endblock %}
+
+{% block content %}
+
+<div class="row mb-4">
+
+    <div class="col-md-12">
+
+        <h2>
+
+            Order Details
+
+        </h2>
+
+    </div>
+
+</div>
+
+
+<!-- ORDER INFORMATION -->
+<div class="row mb-4">
+
+    <div class="col-md-12">
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-dark text-white">
+
+                <h5>
+
+                    Order Information
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>
+
+                                Order ID :
+
+                            </strong>
+
+                            #{{ order.id }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Customer :
+
+                            </strong>
+
+                            {{ order.customer.name }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Email :
+
+                            </strong>
+
+                            {{ order.customer.email }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Phone :
+
+                            </strong>
+
+                            {{ order.phone }}
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>
+
+                                Payment Method :
+
+                            </strong>
+
+                            {{ order.payment_method }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Total Amount :
+
+                            </strong>
+
+                            ₹ {{ order.total_amount }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Order Status :
+
+                            </strong>
+
+                            {% if order.status == 'Pending' %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Pending
+
+                                </span>
+
+                            {% elif order.status == 'Processing' %}
+
+                                <span class="badge bg-primary">
+
+                                    Processing
+
+                                </span>
+
+                            {% elif order.status == 'Completed' %}
+
+                                <span class="badge bg-success">
+
+                                    Completed
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    Cancelled
+
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+
+                                Address :
+
+                            </strong>
+
+                            {{ order.address }}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ORDER ITEMS -->
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div class="card shadow border-0">
+
+            <div class="card-header bg-success text-white">
+
+                <h5>
+
+                    Ordered Products
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if order.items %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered align-middle">
+
+                            <thead class="table-dark">
+
+                                <tr>
+
+                                    <th>
+
+                                        Product
+
+                                    </th>
+
+                                    <th>
+
+                                        Price
+
+                                    </th>
+
+                                    <th>
+
+                                        Quantity
+
+                                    </th>
+
+                                    <th>
+
+                                        GST
+
+                                    </th>
+
+                                    <th>
+
+                                        Total
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for item in order.items %}
+
+                                    <tr>
+
+                                        <!-- PRODUCT -->
+                                        <td>
+
+                                            <div class="d-flex align-items-center">
+
+                                                {% if item.product_image %}
+
+                                                    <img
+                                                        src="{{ url_for('static', filename='images/' + item.product_image) }}"
+                                                        width="80"
+                                                        height="80"
+                                                        class="rounded me-3"
+                                                        style="object-fit: cover;"
+                                                    >
+
+                                                {% endif %}
+
+                                                <div>
+
+                                                    <strong>
+
+                                                        {{ item.product_name }}
+
+                                                    </strong>
+
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- PRICE -->
+                                        <td>
+
+                                            ₹ {{ item.product_price }}
+
+                                        </td>
+
+
+                                        <!-- QUANTITY -->
+                                        <td>
+
+                                            {{ item.quantity }}
+
+                                        </td>
+
+
+                                        <!-- GST -->
+                                        <td>
+
+                                            ₹ {{ item.gst }}
+
+                                        </td>
+
+
+                                        <!-- TOTAL -->
+                                        <td>
+
+                                            ₹ {{ item.subtotal }}
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-warning">
+
+                        No Items Found
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BACK BUTTON -->
+<div class="row mt-4">
+
+    <div class="col-md-12">
+
+        <a
+            href="{{ url_for('web.my_orders') }}"
+            class="btn btn-secondary"
+        >
+
+            <i class="fa fa-arrow-left"></i>
+
+            Back To Orders
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

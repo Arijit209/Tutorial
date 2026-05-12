@@ -1,35 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'admin/base.html' %}
 
-<head>
+{% block title %}
+Admin Register
+{% endblock %}
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Admin Register</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
-</head>
-
-<body class="bg-light">
+{% block content %}
 
 <div class="container mt-5">
 
     <div class="row justify-content-center">
 
-        <div class="col-md-5">
+        <div class="col-md-6">
 
             <div class="card shadow">
 
-                <div class="card-header text-center">
+                <div class="card-header bg-dark text-white text-center">
 
                     <h3>
                         Admin Register
@@ -41,90 +26,153 @@
 
                     <!-- FLASH MESSAGE -->
                     {% with messages = get_flashed_messages(with_categories=true) %}
+
                         {% if messages %}
 
-                            {% for message in messages %}
+                            {% for category, message in messages %}
 
-                                <div class="alert alert-{{ category }}">
+                                <div class="alert alert-{{ category }} alert-dismissible fade show">
+
                                     {{ message }}
+
+                                    <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="alert"
+                                    ></button>
+
                                 </div>
 
                             {% endfor %}
 
                         {% endif %}
+
                     {% endwith %}
 
                     <!-- REGISTER FORM -->
                     <form method="POST">
 
+                        <!-- USERNAME -->
                         <div class="mb-3">
 
                             <label class="form-label">
+
                                 Username
+
                             </label>
 
                             <input
                                 type="text"
                                 name="username"
                                 class="form-control"
-                                placeholder="Enter username"
+                                placeholder="Enter Username"
                                 required
                             >
 
                         </div>
 
+                        <!-- EMAIL -->
                         <div class="mb-3">
 
                             <label class="form-label">
+
                                 Email
+
                             </label>
 
                             <input
                                 type="email"
                                 name="email"
                                 class="form-control"
-                                placeholder="Enter email"
+                                placeholder="Enter Email"
                                 required
                             >
 
                         </div>
 
+                        <!-- PASSWORD -->
                         <div class="mb-3">
 
                             <label class="form-label">
+
                                 Password
+
                             </label>
 
                             <input
                                 type="password"
                                 name="password"
                                 class="form-control"
-                                placeholder="Enter password"
+                                placeholder="Enter Password"
                                 required
                             >
 
                         </div>
 
-                        <button
-                            type="submit"
-                            class="btn btn-success w-100"
-                        >
-                            Register
-                        </button>
+                        <!-- ROLE -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Role
+
+                            </label>
+
+                            <select
+                                name="role"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+
+                                    Select Role
+
+                                </option>
+
+                                <option value="staff">
+
+                                    Staff
+
+                                </option>
+
+                                <option value="super_admin">
+
+                                    Super Admin
+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- SUBMIT BUTTON -->
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-dark"
+                            >
+
+                                Register
+
+                            </button>
+
+                        </div>
 
                     </form>
 
-                    <hr>
+                </div>
 
-                    <div class="text-center">
+                <div class="card-footer text-center">
 
-                        <a
-                            href="{{ url_for('admin_login') }}"
-                        >
-                            Already have account?
-                        </a>
+                    Already have an account?
 
-                    </div>
+                    <a href="{{ url_for('admin.admin_login') }}">
+
+                        Login Here
+
+                    </a>
 
                 </div>
 
@@ -136,5 +184,4 @@
 
 </div>
 
-</body>
-</html>
+{% endblock %}

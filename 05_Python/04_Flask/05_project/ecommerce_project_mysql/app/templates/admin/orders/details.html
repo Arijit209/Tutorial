@@ -4,124 +4,86 @@
 Order Details
 {% endblock %}
 
+{% block page_title %}
+Order Details
+{% endblock %}
+
 {% block content %}
 
-<h2 class="mb-4">
-    Order #{{ order.id }}
-</h2>
-
-<div class="row">
+<div class="container-fluid">
 
     <!-- ORDER INFO -->
-    <div class="col-md-4">
+    <div class="card card-box mb-4">
 
-        <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white">
 
-            <div class="card-header bg-dark text-white">
+            <h5>
 
-                <h4>
-                    Customer Details
-                </h4>
+                Order Information
 
-            </div>
-
-            <div class="card-body">
-
-                <p>
-
-                    <strong>Name:</strong>
-                    {{ order.customer.name }}
-
-                </p>
-
-                <p>
-
-                    <strong>Email:</strong>
-                    {{ order.customer.email }}
-
-                </p>
-
-                <p>
-
-                    <strong>Address:</strong>
-                    {{ order.address }}
-
-                </p>
-
-                <p>
-
-                    <strong>Total:</strong>
-                    ₹ {{ order.total_amount }}
-
-                </p>
-
-                <p>
-
-                    <strong>Status:</strong>
-                    {{ order.status }}
-
-                </p>
-
-            </div>
+            </h5>
 
         </div>
 
-        <!-- STATUS UPDATE -->
-        <div class="card shadow">
+        <div class="card-body">
 
-            <div class="card-header bg-primary text-white">
+            <div class="row">
 
-                <h4>
-                    Update Status
-                </h4>
+                <div class="col-md-6">
 
-            </div>
+                    <p>
 
-            <div class="card-body">
+                        <strong>Order ID :</strong>
 
-                <form
-                    method="POST"
-                    action="{{ url_for('update_order_status', id=order.id) }}"
-                >
+                        #{{ order.id }}
 
-                    <div class="mb-3">
+                    </p>
 
-                        <select
-                            name="status"
-                            class="form-select"
-                        >
+                    <p>
 
-                            <option value="Pending">
-                                Pending
-                            </option>
+                        <strong>Customer Name :</strong>
 
-                            <option value="Confirmed">
-                                Confirmed
-                            </option>
+                        {{ order.customer.name }}
 
-                            <option value="Shipped">
-                                Shipped
-                            </option>
+                    </p>
 
-                            <option value="Delivered">
-                                Delivered
-                            </option>
+                    <p>
 
-                            <option value="Cancelled">
-                                Cancelled
-                            </option>
+                        <strong>Email :</strong>
 
-                        </select>
+                        {{ order.customer.email }}
 
-                    </div>
+                    </p>
 
-                    <button
-                        class="btn btn-success w-100"
-                    >
-                        Update Status
-                    </button>
+                </div>
 
-                </form>
+                <div class="col-md-6">
+
+                    <p>
+
+                        <strong>Total Amount :</strong>
+
+                        ₹ {{ order.total_amount }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Status :</strong>
+
+                        {{ order.status }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Shipping Address :</strong>
+
+                        {{ order.address }}
+
+                    </p>
+
+                </div>
 
             </div>
 
@@ -129,77 +91,230 @@ Order Details
 
     </div>
 
-    <!-- ORDER ITEMS -->
-    <div class="col-md-8">
 
-        <div class="card shadow">
+    <!-- UPDATE STATUS -->
+    <div class="card card-box mb-4">
 
-            <div class="card-header bg-success text-white">
+        <div class="card-header bg-primary text-white">
 
-                <h4>
-                    Order Items
-                </h4>
+            <h5>
 
-            </div>
+                Update Order Status
 
-            <div class="card-body">
-
-                <table class="table table-bordered">
-
-                    <thead class="table-dark">
-
-                        <tr>
-
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {% for item in order.order_items %}
-
-                        <tr>
-
-                            <td>
-
-                                {{ item.product_name }}
-
-                            </td>
-
-                            <td>
-
-                                ₹ {{ item.product_price }}
-
-                            </td>
-
-                            <td>
-
-                                {{ item.quantity }}
-
-                            </td>
-
-                            <td>
-
-                                ₹ {{ item.subtotal }}
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            </h5>
 
         </div>
+
+        <div class="card-body">
+
+            <form
+                method="POST"
+                action="{{ url_for('admin.update_order_status', id=order.id) }}"
+            >
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <select
+                            name="status"
+                            class="form-select"
+                            required
+                        >
+
+                            <option
+                                value="Pending"
+                                {% if order.status == 'Pending' %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                Pending
+
+                            </option>
+
+                            <option
+                                value="Processing"
+                                {% if order.status == 'Processing' %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                Processing
+
+                            </option>
+
+                            <option
+                                value="Completed"
+                                {% if order.status == 'Completed' %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                Completed
+
+                            </option>
+
+                            <option
+                                value="Cancelled"
+                                {% if order.status == 'Cancelled' %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                Cancelled
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+
+                            <i class="fa fa-save"></i>
+
+                            Update Status
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ORDER ITEMS -->
+    <div class="card card-box">
+
+        <div class="card-header bg-success text-white">
+
+            <h5>
+
+                Ordered Products
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if order.items %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>
+
+                                    Product Name
+
+                                </th>
+
+                                <th>
+
+                                    Price
+
+                                </th>
+
+                                <th>
+
+                                    Quantity
+
+                                </th>
+
+                                <th>
+
+                                    Subtotal
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in order.items %}
+
+                                <tr>
+
+                                    <td>
+
+                                        {{ item.product_name }}
+
+                                    </td>
+
+                                    <td>
+
+                                        ₹ {{ item.product_price }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ item.quantity }}
+
+                                    </td>
+
+                                    <td>
+
+                                        ₹ {{ item.subtotal }}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    No Products Found
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- BACK BUTTON -->
+    <div class="mt-4">
+
+        <a
+            href="{{ url_for('admin.admin_orders') }}"
+            class="btn btn-secondary"
+        >
+
+            <i class="fa fa-arrow-left"></i>
+
+            Back To Orders
+
+        </a>
 
     </div>
 

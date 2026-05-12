@@ -1,0 +1,95 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="card shadow">
+
+            <div class="card-header bg-dark text-white">
+
+                <h4>
+
+                    My Profile
+
+                </h4>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    <div class="mb-3">
+
+                        <label>
+
+                            Name
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            value="{{ customer.name }}"
+                            class="form-control"
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+
+                            Email
+
+                        </label>
+
+                        <input
+                            type="email"
+                            value="{{ customer.email }}"
+                            class="form-control"
+                            readonly
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+
+                            Phone
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            value="{{ customer.phone }}"
+                            class="form-control"
+                        >
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-dark"
+                    >
+
+                        Update Profile
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

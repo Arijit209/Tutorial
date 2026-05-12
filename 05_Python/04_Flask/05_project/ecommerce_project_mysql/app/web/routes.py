@@ -1,10 +1,11 @@
 from flask import (
+    Blueprint,
     render_template,
     request,
     redirect,
     url_for,
-    session,
-    flash
+    flash,
+    session
 )
 
 from werkzeug.security import (
@@ -12,17 +13,35 @@ from werkzeug.security import (
     check_password_hash
 )
 
-from app.web import web
-
 from app import db
 
-from app.models.product import Product
-from app.models.category import Category
 from app.models.customer import Customer
+from app.models.category import Category
+from app.models.product import Product
 from app.models.order import Order
 from app.models.order_item import OrderItem
+from app.models.address import Address
 
 
+# =========================================
+# WEB BLUEPRINT
+# =========================================
+web = Blueprint(
+    'web',
+    __name__
+)
+
+
+# =========================================
+# CUSTOMER LOGIN REQUIRED
+# =========================================
+def customer_login_required():
+
+    if 'customer_id' not in session:
+
+        return False
+
+    return True
 
 
 # =========================================
@@ -31,14 +50,47 @@ from app.models.order_item import OrderItem
 @web.route('/')
 def home():
 
-    products = Product.query.all()
+    search = request.args.get('search', '')
+
+    category_id = request.args.get('category', '')
+
+    page = request.args.get(
+        'page',
+        1,
+        type=int
+    )
+
+    products_query = Product.query
+
+    # SEARCH
+    if search:
+
+        products_query = products_query.filter(
+            Product.name.ilike(f'%{search}%')
+        )
+
+    # CATEGORY FILTER
+    if category_id:
+
+        products_query = products_query.filter_by(
+            category_id=category_id
+        )
+
+    products = products_query.order_by(
+        Product.id.desc()
+    ).paginate(
+        page=page,
+        per_page=6
+    )
 
     categories = Category.query.all()
 
     return render_template(
-        'web/index.html',
+        'web/home.html',
         products=products,
-        categories=categories
+        categories=categories,
+        search=search,
+        category_id=category_id
     )
 
 
@@ -50,90 +102,35 @@ def product_details(id):
 
     product = Product.query.get_or_404(id)
 
-    categories = Category.query.all()
-
-    # GST
     gst = round(
         (product.price * 18) / 100,
         2
     )
 
-    # FINAL PRICE
     final_price = round(
         product.price + gst,
         2
     )
 
+    related_products = Product.query.filter(
+        Product.category_id == product.category_id,
+        Product.id != product.id
+    ).limit(4).all()
+
     return render_template(
         'web/product_details.html',
         product=product,
-        categories=categories,
         gst=gst,
-        final_price=final_price
-    )
-
-
-# =========================================
-# CATEGORY PRODUCTS
-# =========================================
-@web.route('/category/<int:id>')
-def category_products(id):
-
-    category = Category.query.get_or_404(id)
-
-    products = Product.query.filter_by(
-        category_id=id
-    ).all()
-
-    categories = Category.query.all()
-
-    return render_template(
-        'web/category_products.html',
-        category=category,
-        products=products,
-        categories=categories
-    )
-
-
-# =========================================
-# SEARCH PRODUCTS
-# =========================================
-@web.route('/search')
-def search():
-
-    keyword = request.args.get('keyword')
-
-    products = Product.query.filter(
-        Product.name.ilike(
-            f'%{keyword}%'
-        )
-    ).all()
-
-    categories = Category.query.all()
-
-    return render_template(
-        'web/search.html',
-        products=products,
-        keyword=keyword,
-        categories=categories
+        final_price=final_price,
+        related_products=related_products
     )
 
 
 # =========================================
 # CUSTOMER REGISTER
 # =========================================
-@web.route(
-    '/register',
-    methods=['GET', 'POST']
-)
+@web.route('/register', methods=['GET', 'POST'])
 def register():
-
-    # ALREADY LOGIN
-    if 'customer_id' in session:
-
-        return redirect(
-            url_for('home')
-        )
 
     if request.method == 'POST':
 
@@ -141,41 +138,55 @@ def register():
 
         email = request.form.get('email')
 
-        password = request.form.get(
-            'password'
+        phone = request.form.get('phone')
+
+        password = request.form.get('password')
+
+        confirm_password = request.form.get(
+            'confirm_password'
         )
 
-        # CHECK EMAIL EXISTS
-        existing_user = Customer.query.filter_by(
-            email=email
-        ).first()
-
-        if existing_user:
+        # CHECK PASSWORD
+        if password != confirm_password:
 
             flash(
-                'Email already exists',
+                'Password Does Not Match',
                 'danger'
             )
 
             return redirect(
-                url_for('register')
+                url_for('web.register')
+            )
+
+        # CHECK EMAIL EXISTS
+        old_customer = Customer.query.filter_by(
+            email=email
+        ).first()
+
+        if old_customer:
+
+            flash(
+                'Email Already Exists',
+                'danger'
+            )
+
+            return redirect(
+                url_for('web.register')
             )
 
         # HASH PASSWORD
-        hashed_password = (
-            generate_password_hash(
-                password
-            )
+        hashed_password = generate_password_hash(
+            password
         )
 
         customer = Customer(
             name=name,
             email=email,
+            phone=phone,
             password=hashed_password
         )
 
         db.session.add(customer)
-
         db.session.commit()
 
         flash(
@@ -184,92 +195,80 @@ def register():
         )
 
         return redirect(
-            url_for('login')
+            url_for('web.login')
         )
 
     return render_template(
-        'web/register.html',
-        categories=Category.query.all()
+        'web/register.html'
     )
 
 
 # =========================================
 # CUSTOMER LOGIN
 # =========================================
-@web.route(
-    '/login',
-    methods=['GET', 'POST']
-)
+@web.route('/login', methods=['GET', 'POST'])
 def login():
-
-    # ALREADY LOGIN
-    if 'customer_id' in session:
-
-        return redirect(
-            url_for('home')
-        )
 
     if request.method == 'POST':
 
         email = request.form.get('email')
 
-        password = request.form.get(
-            'password'
-        )
+        password = request.form.get('password')
 
         customer = Customer.query.filter_by(
             email=email
         ).first()
 
-        if customer and check_password_hash(
+        if not customer:
+
+            flash(
+                'Invalid Email',
+                'danger'
+            )
+
+            return redirect(
+                url_for('web.login')
+            )
+
+        if not check_password_hash(
             customer.password,
             password
         ):
 
-            # STORE SESSION
-            session['customer_id'] = (
-                customer.id
-            )
-
-            session['customer_name'] = (
-                customer.name
-            )
-
             flash(
-                'Login Successful',
-                'success'
+                'Invalid Password',
+                'danger'
             )
 
             return redirect(
-                url_for('home')
+                url_for('web.login')
             )
 
+        # SESSION
+        session['customer_id'] = customer.id
+        session['customer_name'] = customer.name
+
         flash(
-            'Invalid Email or Password',
-            'danger'
+            'Login Successful',
+            'success'
+        )
+
+        return redirect(
+            url_for('web.home')
         )
 
     return render_template(
-        'web/login.html',
-        categories=Category.query.all()
+        'web/login.html'
     )
 
 
 # =========================================
-# CUSTOMER LOGOUT
+# LOGOUT
 # =========================================
 @web.route('/logout')
 def logout():
 
-    session.pop(
-        'customer_id',
-        None
-    )
-
-    session.pop(
-        'customer_name',
-        None
-    )
+    session.clear()
 
     flash(
         'Logout Successful',
@@ -277,7 +276,7 @@ def logout():
     )
 
     return redirect(
-        url_for('home')
+        url_for('web.login')
     )
 
 
@@ -289,42 +288,27 @@ def add_to_cart(id):
 
     product = Product.query.get_or_404(id)
 
-    # CREATE CART SESSION
-    if 'cart' not in session:
-
-        session['cart'] = {}
-
-    cart = session['cart']
+    cart = session.get('cart', {})
 
     product_id = str(product.id)
 
-    # PRODUCT EXISTS
     if product_id in cart:
 
-        cart[product_id]['quantity'] += 1
+        cart[product_id] += 1
 
     else:
 
-        cart[product_id] = {
-
-            'name': product.name,
-
-            'price': float(product.price),
-
-            'quantity': 1,
-
-            'image': product.image
-        }
+        cart[product_id] = 1
 
     session['cart'] = cart
 
     flash(
-        'Product added to cart',
+        'Product Added To Cart',
         'success'
     )
 
     return redirect(
-        url_for('cart')
+        url_for('web.cart')
     )
 
 
@@ -334,198 +318,204 @@ def add_to_cart(id):
 @web.route('/cart')
 def cart():
 
-    cart_items = session.get(
-        'cart',
-        {}
-    )
+    cart = session.get('cart', {})
+
+    cart_items = []
 
     subtotal = 0
 
-    # SUBTOTAL
-    for item in cart_items.values():
+    total_gst = 0
 
-        subtotal += (
-            item['price'] *
-            item['quantity']
-        )
+    grand_total = 0
 
-    # GST
-    gst = round(
-        (subtotal * 18) / 100,
-        2
-    )
+    for product_id, quantity in cart.items():
 
-    # FINAL TOTAL
-    final_total = round(
-        subtotal + gst,
-        2
-    )
+        product = Product.query.get(product_id)
+
+        if product:
+
+            item_total = product.price * quantity
+
+            gst = round(
+                (item_total * 18) / 100,
+                2
+            )
+
+            final_total = round(
+                item_total + gst,
+                2
+            )
+
+            subtotal += item_total
+
+            total_gst += gst
+
+            grand_total += final_total
+
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'gst': gst,
+                'total': final_total
+            })
 
     return render_template(
         'web/cart.html',
         cart_items=cart_items,
-        subtotal=subtotal,
-        gst=gst,
-        final_total=final_total,
-        categories=Category.query.all()
-    )
-
-
-# =========================================
-# UPDATE CART
-# =========================================
-@web.route('/update-cart/<product_id>')
-def update_cart(product_id):
-
-    action = request.args.get(
-        'action'
-    )
-
-    cart = session.get(
-        'cart',
-        {}
-    )
-
-    if product_id in cart:
-
-        if action == 'increase':
-
-            cart[product_id]['quantity'] += 1
-
-        elif action == 'decrease':
-
-            if cart[product_id]['quantity'] > 1:
-
-                cart[product_id]['quantity'] -= 1
-
-    session['cart'] = cart
-
-    return redirect(
-        url_for('cart')
+        subtotal=round(subtotal, 2),
+        total_gst=round(total_gst, 2),
+        grand_total=round(grand_total, 2)
     )
 
 
 # =========================================
 # REMOVE CART ITEM
 # =========================================
-@web.route('/remove-cart/<product_id>')
-def remove_cart(product_id):
+@web.route('/remove-cart/<int:id>')
+def remove_cart(id):
 
-    cart = session.get(
-        'cart',
-        {}
-    )
+    cart = session.get('cart', {})
+
+    product_id = str(id)
 
     if product_id in cart:
 
-        cart.pop(product_id)
+        del cart[product_id]
 
     session['cart'] = cart
 
     flash(
-        'Item removed from cart',
-        'danger'
+        'Item Removed From Cart',
+        'success'
     )
 
     return redirect(
-        url_for('cart')
+        url_for('web.cart')
     )
 
 
 # =========================================
 # CHECKOUT
 # =========================================
-@web.route(
-    '/checkout',
-    methods=['GET', 'POST']
-)
+@web.route('/checkout', methods=['GET', 'POST'])
 def checkout():
 
-    # LOGIN CHECK
-    if 'customer_id' not in session:
+    if not customer_login_required():
 
         flash(
-            'Please login first',
-            'warning'
+            'Please Login First',
+            'danger'
         )
 
         return redirect(
-            url_for('login')
+            url_for('web.login')
         )
 
-    cart_items = session.get(
-        'cart',
-        {}
+    customer = Customer.query.get(
+        session['customer_id']
     )
 
-    if not cart_items:
+    cart = session.get('cart', {})
+
+    if not cart:
 
         flash(
-            'Cart is empty',
-            'warning'
+            'Cart Is Empty',
+            'danger'
         )
 
         return redirect(
-            url_for('home')
+            url_for('web.home')
         )
+
+    cart_items = []
 
     subtotal = 0
 
-    for item in cart_items.values():
+    total_gst = 0
 
-        subtotal += (
-            item['price'] *
-            item['quantity']
-        )
+    grand_total = 0
 
-    # GST
-    gst = round(
-        (subtotal * 18) / 100,
-        2
-    )
+    for product_id, quantity in cart.items():
 
-    # FINAL TOTAL
-    final_total = round(
-        subtotal + gst,
-        2
-    )
+        product = Product.query.get(product_id)
+
+        if product:
+
+            item_total = product.price * quantity
+
+            gst = round(
+                (item_total * 18) / 100,
+                2
+            )
+
+            final_total = round(
+                item_total + gst,
+                2
+            )
+
+            subtotal += item_total
+
+            total_gst += gst
+
+            grand_total += final_total
+
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'gst': gst,
+                'total': final_total
+            })
 
     if request.method == 'POST':
 
-        address = request.form.get(
-            'address'
+        # phone = request.form.get('phone')
+
+        # address = request.form.get('address')
+        
+        default_address = Address.query.filter_by(
+            customer_id=customer.id,
+            is_default=True
+        ).first()
+        
+        phone = default_address.phone
+
+        address = (
+            f"{default_address.address}, "
+            f"{default_address.city}, "
+            f"{default_address.state} - "
+            f"{default_address.pincode}"
+        )
+
+        payment_method = request.form.get(
+            'payment_method'
         )
 
         # CREATE ORDER
         order = Order(
-            customer_id=session[
-                'customer_id'
-            ],
-            total_amount=final_total,
-            address=address
+            customer_id=customer.id,
+            phone=phone,
+            address=address,
+            payment_method=payment_method,
+            total_amount=grand_total,
+            status='Pending'
         )
 
         db.session.add(order)
-
         db.session.commit()
 
-        # SAVE ORDER ITEMS
-        for item in cart_items.values():
+        # CREATE ORDER ITEMS
+        for item in cart_items:
 
             order_item = OrderItem(
-
                 order_id=order.id,
-
-                product_name=item['name'],
-
-                product_price=item['price'],
-
+                product_id=item['product'].id,
+                product_name=item['product'].name,
+                product_price=item['product'].price,
+                product_image=item['product'].image,
                 quantity=item['quantity'],
-
-                subtotal=(
-                    item['price'] *
-                    item['quantity']
-                )
+                gst=item['gst'],
+                subtotal=item['total']
             )
 
             db.session.add(order_item)
@@ -533,7 +523,7 @@ def checkout():
         db.session.commit()
 
         # CLEAR CART
-        session.pop('cart', None)
+        session['cart'] = {}
 
         flash(
             'Order Placed Successfully',
@@ -541,42 +531,201 @@ def checkout():
         )
 
         return redirect(
-            url_for('home')
+            url_for('web.my_orders')
         )
 
     return render_template(
         'web/checkout.html',
+        customer=customer,
         cart_items=cart_items,
-        subtotal=subtotal,
-        gst=gst,
-        final_total=final_total,
-        categories=Category.query.all()
+        subtotal=round(subtotal, 2),
+        total_gst=round(total_gst, 2),
+        grand_total=round(grand_total, 2)
     )
-
-
+    
 # =========================================
 # MY ORDERS
 # =========================================
 @web.route('/my-orders')
 def my_orders():
 
-    # LOGIN CHECK
-    if 'customer_id' not in session:
+    if not customer_login_required():
+
+        flash(
+            'Please Login First',
+            'danger'
+        )
 
         return redirect(
-            url_for('login')
+            url_for('web.login')
         )
 
     orders = Order.query.filter_by(
-        customer_id=session[
-            'customer_id'
-        ]
+        customer_id=session['customer_id']
     ).order_by(
         Order.id.desc()
     ).all()
 
     return render_template(
         'web/my_orders.html',
-        orders=orders,
-        categories=Category.query.all()
+        orders=orders
+    )
+
+# =========================================
+# INCREMENT CART ITEM
+# =========================================
+@web.route('/cart/increment/<int:id>')
+def increment_cart(id):
+
+    cart = session.get('cart', {})
+
+    product_id = str(id)
+
+    if product_id in cart:
+
+        cart[product_id] += 1
+
+    session['cart'] = cart
+
+    return redirect(
+        url_for('web.cart')
+    )
+    
+# =========================================
+# DECREMENT CART ITEM
+# =========================================
+@web.route('/cart/decrement/<int:id>')
+def decrement_cart(id):
+
+    cart = session.get('cart', {})
+
+    product_id = str(id)
+
+    if product_id in cart:
+
+        if cart[product_id] > 1:
+
+            cart[product_id] -= 1
+
+        else:
+
+            del cart[product_id]
+
+    session['cart'] = cart
+
+    return redirect(
+        url_for('web.cart')
+    )
+    
+# =========================================
+# CUSTOMER PROFILE
+# =========================================
+@web.route('/profile', methods=['GET', 'POST'])
+def profile():
+
+    if not customer_login_required():
+
+        return redirect(
+            url_for('web.login')
+        )
+
+    customer = Customer.query.get(
+        session['customer_id']
+    )
+
+    if request.method == 'POST':
+
+        customer.name = request.form.get('name')
+
+        customer.phone = request.form.get('phone')
+
+        db.session.commit()
+
+        flash(
+            'Profile Updated Successfully',
+            'success'
+        )
+
+        return redirect(
+            url_for('web.profile')
+        )
+
+    return render_template(
+        'web/profile.html',
+        customer=customer
+    )
+    
+# =========================================
+# ADD ADDRESS
+# =========================================
+@web.route('/add-address', methods=['GET', 'POST'])
+def add_address():
+
+    if not customer_login_required():
+
+        return redirect(
+            url_for('web.login')
+        )
+
+    if request.method == 'POST':
+
+        address = Address(
+
+            customer_id=session['customer_id'],
+
+            full_name=request.form.get(
+                'full_name'
+            ),
+
+            phone=request.form.get(
+                'phone'
+            ),
+
+            address=request.form.get(
+                'address'
+            ),
+
+            city=request.form.get(
+                'city'
+            ),
+
+            state=request.form.get(
+                'state'
+            ),
+
+            pincode=request.form.get(
+                'pincode'
+            ),
+
+            country=request.form.get(
+                'country'
+            ),
+
+            is_default=True
+        )
+
+        # REMOVE OLD DEFAULT
+        old_addresses = Address.query.filter_by(
+            customer_id=session['customer_id']
+        ).all()
+
+        for old in old_addresses:
+
+            old.is_default = False
+
+        db.session.add(address)
+
+        db.session.commit()
+
+        flash(
+            'Address Added Successfully',
+            'success'
+        )
+
+        return redirect(
+            url_for('web.profile')
+        )
+
+    return render_template(
+        'web/add_address.html'
     )

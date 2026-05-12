@@ -4,21 +4,235 @@
 Dashboard
 {% endblock %}
 
+{% block page_title %}
+Admin Dashboard
+{% endblock %}
+
 {% block content %}
 
-<div class="card shadow">
+<div class="container-fluid">
 
-    <div class="card-body">
+    <!-- TOP CARDS -->
+    <div class="row">
 
-        <h2>
-            Admin Dashboard 😄
-        </h2>
+        <!-- TOTAL CATEGORIES -->
+        <div class="col-md-3 mb-4">
 
-        <hr>
+            <div class="card card-box bg-primary text-white">
 
-        <h4>
-            Welcome To Flask Ecommerce
-        </h4>
+                <div class="card-body text-center">
+
+                    <h5>
+
+                        Total Categories
+
+                    </h5>
+
+                    <h2>
+
+                        {{ total_categories }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL PRODUCTS -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card card-box bg-success text-white">
+
+                <div class="card-body text-center">
+
+                    <h5>
+
+                        Total Products
+
+                    </h5>
+
+                    <h2>
+
+                        {{ total_products }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL USERS -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card card-box bg-warning text-dark">
+
+                <div class="card-body text-center">
+
+                    <h5>
+
+                        Total Users
+
+                    </h5>
+
+                    <h2>
+
+                        {{ total_users }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL ORDERS -->
+        <div class="col-md-3 mb-4">
+
+            <div class="card card-box bg-danger text-white">
+
+                <div class="card-body text-center">
+
+                    <h5>
+
+                        Total Orders
+
+                    </h5>
+
+                    <h2>
+
+                        {{ total_orders }}
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUICK ACTIONS -->
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="card card-box">
+
+                <div class="card-header bg-dark text-white">
+
+                    <h5>
+
+                        Quick Actions
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <a
+                        href="{{ url_for('admin.create_category') }}"
+                        class="btn btn-primary me-2 mb-2"
+                    >
+
+                        <i class="fa fa-plus"></i>
+
+                        Add Category
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin.create_product') }}"
+                        class="btn btn-success me-2 mb-2"
+                    >
+
+                        <i class="fa fa-box"></i>
+
+                        Add Product
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin.products') }}"
+                        class="btn btn-warning me-2 mb-2"
+                    >
+
+                        <i class="fa fa-list"></i>
+
+                        View Products
+
+                    </a>
+
+                    <a
+                        href="{{ url_for('admin.admin_orders') }}"
+                        class="btn btn-danger me-2 mb-2"
+                    >
+
+                        <i class="fa fa-shopping-cart"></i>
+
+                        View Orders
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ADMIN INFO -->
+    <div class="row mt-4">
+
+        <div class="col-md-12">
+
+            <div class="card card-box">
+
+                <div class="card-header bg-secondary text-white">
+
+                    <h5>
+
+                        Logged In Admin
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+
+                        <strong>Name :</strong>
+
+                        {{ session.admin_name }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>Role :</strong>
+
+                        {{ session.admin_role }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 

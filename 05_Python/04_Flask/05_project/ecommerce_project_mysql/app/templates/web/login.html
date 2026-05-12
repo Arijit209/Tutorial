@@ -1,7 +1,7 @@
 {% extends 'web/base.html' %}
 
 {% block title %}
-Login
+Customer Login
 {% endblock %}
 
 {% block content %}
@@ -10,71 +10,88 @@ Login
 
     <div class="col-md-5">
 
-        <div class="card shadow">
+        <div class="card shadow border-0 mt-5">
 
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-dark text-white text-center">
 
                 <h3>
+
                     Customer Login
+
                 </h3>
 
             </div>
 
             <div class="card-body">
 
+                <!-- LOGIN FORM -->
                 <form method="POST">
 
+                    <!-- EMAIL -->
                     <div class="mb-3">
 
-                        <label>
+                        <label class="form-label">
+
                             Email
+
                         </label>
 
                         <input
                             type="email"
                             name="email"
                             class="form-control"
+                            placeholder="Enter Email"
                             required
                         >
 
                     </div>
 
+
+                    <!-- PASSWORD -->
                     <div class="mb-3">
 
-                        <label>
+                        <label class="form-label">
+
                             Password
+
                         </label>
 
                         <input
                             type="password"
                             name="password"
                             class="form-control"
+                            placeholder="Enter Password"
                             required
                         >
 
                     </div>
 
+
+                    <!-- BUTTON -->
                     <button
-                        class="btn btn-primary w-100"
+                        type="submit"
+                        class="btn btn-dark w-100"
                     >
+
+                        <i class="fa fa-sign-in-alt"></i>
+
                         Login
+
                     </button>
 
                 </form>
 
-                <hr>
+            </div>
 
-                <p class="text-center">
+            <div class="card-footer text-center">
 
-                    Create new account?
+                Don't have an account?
 
-                    <a
-                        href="{{ url_for('register') }}"
-                    >
-                        Register
-                    </a>
+                <a href="{{ url_for('web.register') }}">
 
-                </p>
+                    Register Here
+
+                </a>
 
             </div>
 

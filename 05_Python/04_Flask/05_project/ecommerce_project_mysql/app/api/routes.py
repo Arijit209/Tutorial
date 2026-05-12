@@ -1,6 +1,7 @@
 from flask import (
-    jsonify,
-    request
+    Blueprint,
+    request,
+    jsonify
 )
 
 from werkzeug.security import (
@@ -9,89 +10,259 @@ from werkzeug.security import (
 )
 
 from flask_jwt_extended import (
-
     create_access_token,
-
     jwt_required,
-
     get_jwt_identity
 )
 
-from app.api import api
-
 from app import db
 
-from app.models.product import Product
-
-from app.models.category import Category
-
 from app.models.customer import Customer
-
+from app.models.category import Category
+from app.models.product import Product
 from app.models.order import Order
-
 from app.models.order_item import OrderItem
 
 
+# =========================================
+# API BLUEPRINT
+# =========================================
+api = Blueprint(
+    'api',
+    __name__,
+    url_prefix='/api'
+)
 
 
 # =========================================
 # API HOME
 # =========================================
-@api.route('/api')
+@api.route('/')
 def api_home():
 
     return jsonify({
-
-        'status': True,
-
+        'success': True,
         'message': 'Flask Ecommerce API'
     })
 
 
 # =========================================
-# ALL PRODUCTS API
+# CUSTOMER REGISTER API
 # =========================================
-@api.route('/api/products')
-def api_products():
+@api.route('/register', methods=['POST'])
+def api_register():
 
-    products = Product.query.all()
+    data = request.get_json()
 
-    data = []
+    name = data.get('name')
+
+    email = data.get('email')
+
+    phone = data.get('phone')
+
+    password = data.get('password')
+
+    confirm_password = data.get(
+        'confirm_password'
+    )
+
+    # VALIDATION
+    if password != confirm_password:
+
+        return jsonify({
+            'success': False,
+            'message': 'Password Does Not Match'
+        }), 400
+
+    # CHECK EMAIL EXISTS
+    old_customer = Customer.query.filter_by(
+        email=email
+    ).first()
+
+    if old_customer:
+
+        return jsonify({
+            'success': False,
+            'message': 'Email Already Exists'
+        }), 400
+
+    # HASH PASSWORD
+    hashed_password = generate_password_hash(
+        password
+    )
+
+    customer = Customer(
+        name=name,
+        email=email,
+        phone=phone,
+        password=hashed_password
+    )
+
+    db.session.add(customer)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'message': 'Registration Successful'
+    })
+
+
+# =========================================
+# CUSTOMER LOGIN API
+# =========================================
+@api.route('/login', methods=['POST'])
+def api_login():
+
+    data = request.get_json()
+
+    email = data.get('email')
+
+    password = data.get('password')
+
+    customer = Customer.query.filter_by(
+        email=email
+    ).first()
+
+    # EMAIL CHECK
+    if not customer:
+
+        return jsonify({
+            'success': False,
+            'message': 'Invalid Email'
+        }), 401
+
+    # PASSWORD CHECK
+    if not check_password_hash(
+        customer.password,
+        password
+    ):
+
+        return jsonify({
+            'success': False,
+            'message': 'Invalid Password'
+        }), 401
+
+    # JWT TOKEN
+    access_token = create_access_token(
+        identity=str(customer.id)
+    )
+
+    return jsonify({
+        'success': True,
+        'message': 'Login Successful',
+        'token': access_token,
+        'customer': {
+            'id': customer.id,
+            'name': customer.name,
+            'email': customer.email,
+            'phone': customer.phone
+        }
+    })
+
+
+# =========================================
+# CUSTOMER PROFILE API
+# =========================================
+@api.route('/profile')
+@jwt_required()
+def profile():
+
+    customer_id = get_jwt_identity()
+
+    customer = Customer.query.get(
+        customer_id
+    )
+
+    if not customer:
+
+        return jsonify({
+            'success': False,
+            'message': 'Customer Not Found'
+        }), 404
+
+    return jsonify({
+        'success': True,
+        'customer': {
+            'id': customer.id,
+            'name': customer.name,
+            'email': customer.email,
+            'phone': customer.phone
+        }
+    })
+
+
+# =========================================
+# CATEGORY LIST API
+# =========================================
+@api.route('/categories')
+def categories():
+
+    categories = Category.query.order_by(
+        Category.id.desc()
+    ).all()
+
+    category_data = []
+
+    for category in categories:
+
+        category_data.append({
+            'id': category.id,
+            'name': category.name
+        })
+
+    return jsonify({
+        'success': True,
+        'categories': category_data
+    })
+
+
+# =========================================
+# PRODUCT LIST API
+# =========================================
+@api.route('/products')
+def products():
+
+    products = Product.query.order_by(
+        Product.id.desc()
+    ).all()
+
+    product_data = []
 
     for product in products:
 
-        data.append({
+        gst = round(
+            (product.price * 18) / 100,
+            2
+        )
 
+        final_price = round(
+            product.price + gst,
+            2
+        )
+
+        product_data.append({
             'id': product.id,
-
             'name': product.name,
-
-            'price': float(product.price),
-
+            'price': product.price,
+            'gst': gst,
+            'final_price': final_price,
             'stock': product.stock,
-
             'description': product.description,
-
             'image': product.image,
-
             'category': product.category.name
         })
 
     return jsonify({
-
-        'status': True,
-
-        'total': len(data),
-
-        'products': data
+        'success': True,
+        'products': product_data
     })
 
 
 # =========================================
 # SINGLE PRODUCT API
 # =========================================
-@api.route('/api/product/<int:id>')
-def api_single_product(id):
+@api.route('/product/<int:id>')
+def single_product(id):
 
     product = Product.query.get_or_404(id)
 
@@ -105,183 +276,71 @@ def api_single_product(id):
         2
     )
 
-    data = {
-
-        'id': product.id,
-
-        'name': product.name,
-
-        'price': float(product.price),
-
-        'gst': gst,
-
-        'final_price': final_price,
-
-        'stock': product.stock,
-
-        'description': product.description,
-
-        'image': product.image,
-
-        'category': product.category.name
-    }
-
     return jsonify({
-
-        'status': True,
-
-        'product': data
+        'success': True,
+        'product': {
+            'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'gst': gst,
+            'final_price': final_price,
+            'stock': product.stock,
+            'description': product.description,
+            'image': product.image,
+            'category': product.category.name
+        }
     })
 
 
 # =========================================
-# ALL CATEGORIES API
+# SEARCH PRODUCT API
 # =========================================
-@api.route('/api/categories')
-def api_categories():
+@api.route('/search')
+def search_product():
 
-    categories = Category.query.all()
-
-    data = []
-
-    for category in categories:
-
-        data.append({
-
-            'id': category.id,
-
-            'name': category.name
-        })
-
-    return jsonify({
-
-        'status': True,
-
-        'categories': data
-    })
-
-
-# =========================================
-# CUSTOMER REGISTER API
-# =========================================
-@api.route(
-    '/api/register',
-    methods=['POST']
-)
-def api_register():
-
-    data = request.get_json()
-
-    name = data.get('name')
-
-    email = data.get('email')
-
-    password = data.get('password')
-
-    # EMAIL CHECK
-    existing_user = Customer.query.filter_by(
-        email=email
-    ).first()
-
-    if existing_user:
-
-        return jsonify({
-
-            'status': False,
-
-            'message': 'Email already exists'
-        })
-
-    # HASH PASSWORD
-    hashed_password = (
-        generate_password_hash(
-            password
-        )
+    keyword = request.args.get(
+        'keyword',
+        ''
     )
 
-    customer = Customer(
+    products = Product.query.filter(
+        Product.name.ilike(f'%{keyword}%')
+    ).all()
 
-        name=name,
+    product_data = []
 
-        email=email,
+    for product in products:
 
-        password=hashed_password
-    )
-
-    db.session.add(customer)
-
-    db.session.commit()
-
-    return jsonify({
-
-        'status': True,
-
-        'message': 'Registration Successful'
-    })
-
-
-# =========================================
-# CUSTOMER LOGIN API
-# =========================================
-@api.route(
-    '/api/login',
-    methods=['POST']
-)
-def api_login():
-
-    data = request.get_json()
-
-    email = data.get('email')
-
-    password = data.get('password')
-
-    customer = Customer.query.filter_by(
-        email=email
-    ).first()
-
-    if customer and check_password_hash(
-        customer.password,
-        password
-    ):
-
-        # CREATE JWT TOKEN
-        access_token = create_access_token(
-
-            identity=customer.id
+        gst = round(
+            (product.price * 18) / 100,
+            2
         )
 
-        return jsonify({
+        final_price = round(
+            product.price + gst,
+            2
+        )
 
-            'status': True,
-
-            'message': 'Login Successful',
-
-            'token': access_token,
-
-            'customer': {
-
-                'id': customer.id,
-
-                'name': customer.name,
-
-                'email': customer.email
-            }
+        product_data.append({
+            'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'final_price': final_price,
+            'image': product.image
         })
 
     return jsonify({
-
-        'status': False,
-
-        'message': 'Invalid Email or Password'
+        'success': True,
+        'products': product_data
     })
 
 
 # =========================================
-# CUSTOMER PROFILE API
+# CREATE ORDER API
 # =========================================
-@api.route('/api/profile')
+@api.route('/create-order', methods=['POST'])
 @jwt_required()
-def api_profile():
+def create_order():
 
     customer_id = get_jwt_identity()
 
@@ -292,116 +351,37 @@ def api_profile():
     if not customer:
 
         return jsonify({
-
-            'status': False,
-
-            'message': 'Customer not found'
-        })
-
-    return jsonify({
-
-        'status': True,
-
-        'customer': {
-
-            'id': customer.id,
-
-            'name': customer.name,
-
-            'email': customer.email
-        }
-    })
-
-
-# =========================================
-# CUSTOMER ORDERS API
-# =========================================
-@api.route('/api/orders')
-@jwt_required()
-def api_orders():
-
-    customer_id = get_jwt_identity()
-
-    orders = Order.query.filter_by(
-        customer_id=customer_id
-    ).order_by(
-        Order.id.desc()
-    ).all()
-
-    data = []
-
-    for order in orders:
-
-        items = []
-
-        for item in order.order_items:
-
-            items.append({
-
-                'product_name': item.product_name,
-
-                'price': item.product_price,
-
-                'quantity': item.quantity,
-
-                'subtotal': item.subtotal
-            })
-
-        data.append({
-
-            'order_id': order.id,
-
-            'total_amount': order.total_amount,
-
-            'status': order.status,
-
-            'address': order.address,
-
-            'created_at': order.created_at,
-
-            'items': items
-        })
-
-    return jsonify({
-
-        'status': True,
-
-        'orders': data
-    })
-
-
-# =========================================
-# PLACE ORDER API
-# =========================================
-@api.route(
-    '/api/place-order',
-    methods=['POST']
-)
-@jwt_required()
-def api_place_order():
-
-    customer_id = get_jwt_identity()
+            'success': False,
+            'message': 'Customer Not Found'
+        }), 404
 
     data = request.get_json()
 
     address = data.get('address')
 
-    products = data.get('products')
+    phone = data.get('phone')
 
-    if not products:
+    payment_method = data.get(
+        'payment_method'
+    )
+
+    items = data.get('items')
+
+    if not items:
 
         return jsonify({
+            'success': False,
+            'message': 'No Items Found'
+        }), 400
 
-            'status': False,
+    subtotal = 0
 
-            'message': 'No products found'
-        })
+    total_gst = 0
 
-    total_amount = 0
+    grand_total = 0
 
-    order_items_data = []
-
-    for item in products:
+    # CALCULATE TOTAL
+    for item in items:
 
         product = Product.query.get(
             item['product_id']
@@ -413,73 +393,69 @@ def api_place_order():
 
         quantity = item['quantity']
 
-        subtotal = (
-            float(product.price) *
-            quantity
+        item_total = product.price * quantity
+
+        gst = round(
+            (item_total * 18) / 100,
+            2
         )
 
-        total_amount += subtotal
+        final_total = round(
+            item_total + gst,
+            2
+        )
 
-        order_items_data.append({
-
-            'product_name': product.name,
-
-            'product_price': float(
-                product.price
-            ),
-
-            'quantity': quantity,
-
-            'subtotal': subtotal
-        })
-
-    # GST
-    gst = round(
-        (total_amount * 18) / 100,
-        2
-    )
-
-    final_total = round(
-        total_amount + gst,
-        2
-    )
+        subtotal += item_total
+        total_gst += gst
+        grand_total += final_total
 
     # CREATE ORDER
     order = Order(
-
-        customer_id=customer_id,
-
-        total_amount=final_total,
-
-        address=address
+        customer_id=customer.id,
+        address=address,
+        phone=phone,
+        payment_method=payment_method,
+        total_amount=grand_total,
+        status='Pending'
     )
 
     db.session.add(order)
-
     db.session.commit()
 
-    # SAVE ORDER ITEMS
-    for item in order_items_data:
+    # CREATE ORDER ITEMS
+    for item in items:
+
+        product = Product.query.get(
+            item['product_id']
+        )
+
+        if not product:
+
+            continue
+
+        quantity = item['quantity']
+
+        item_total = product.price * quantity
+
+        gst = round(
+            (item_total * 18) / 100,
+            2
+        )
+
+        final_total = round(
+            item_total + gst,
+            2
+        )
 
         order_item = OrderItem(
-
             order_id=order.id,
-
-            product_name=item[
-                'product_name'
-            ],
-
-            product_price=item[
-                'product_price'
-            ],
-
-            quantity=item[
-                'quantity'
-            ],
-
-            subtotal=item[
-                'subtotal'
-            ]
+            product_id=product.id,
+            product_name=product.name,
+            product_price=product.price,
+            product_image=product.image,
+            quantity=quantity,
+            gst=gst,
+            subtotal=final_total
         )
 
         db.session.add(order_item)
@@ -487,12 +463,90 @@ def api_place_order():
     db.session.commit()
 
     return jsonify({
-
-        'status': True,
-
-        'message': 'Order Placed Successfully',
-
+        'success': True,
+        'message': 'Order Created Successfully',
         'order_id': order.id,
+        'subtotal': subtotal,
+        'gst': total_gst,
+        'grand_total': grand_total
+    })
 
-        'total_amount': final_total
+
+# =========================================
+# MY ORDERS API
+# =========================================
+@api.route('/my-orders')
+@jwt_required()
+def my_orders():
+
+    customer_id = get_jwt_identity()
+
+    orders = Order.query.filter_by(
+        customer_id=customer_id
+    ).order_by(
+        Order.id.desc()
+    ).all()
+
+    order_data = []
+
+    for order in orders:
+
+        order_data.append({
+            'id': order.id,
+            'total_amount': order.total_amount,
+            'payment_method': order.payment_method,
+            'status': order.status,
+            'address': order.address
+        })
+
+    return jsonify({
+        'success': True,
+        'orders': order_data
+    })
+
+
+# =========================================
+# SINGLE ORDER API
+# =========================================
+@api.route('/order/<int:id>')
+@jwt_required()
+def single_order(id):
+
+    customer_id = get_jwt_identity()
+
+    order = Order.query.filter_by(
+        id=id,
+        customer_id=customer_id
+    ).first()
+
+    if not order:
+
+        return jsonify({
+            'success': False,
+            'message': 'Order Not Found'
+        }), 404
+
+    items = []
+
+    for item in order.items:
+
+        items.append({
+            'product_name': item.product_name,
+            'product_price': item.product_price,
+            'quantity': item.quantity,
+            'gst': item.gst,
+            'subtotal': item.subtotal,
+            'image': item.product_image
+        })
+
+    return jsonify({
+        'success': True,
+        'order': {
+            'id': order.id,
+            'total_amount': order.total_amount,
+            'payment_method': order.payment_method,
+            'status': order.status,
+            'address': order.address,
+            'items': items
+        }
     })

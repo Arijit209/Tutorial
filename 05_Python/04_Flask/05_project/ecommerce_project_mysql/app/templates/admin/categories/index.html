@@ -1,0 +1,153 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Categories
+{% endblock %}
+
+{% block page_title %}
+All Categories
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- TOP BUTTON -->
+    <div class="mb-3">
+
+        <a
+            href="{{ url_for('admin.create_category') }}"
+            class="btn btn-dark"
+        >
+
+            <i class="fa fa-plus"></i>
+
+            Add Category
+
+        </a>
+
+    </div>
+
+
+    <!-- CATEGORY TABLE -->
+    <div class="card card-box">
+
+        <div class="card-header bg-dark text-white">
+
+            <h5>
+
+                Category List
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if categories %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>
+
+                                    ID
+
+                                </th>
+
+                                <th>
+
+                                    Category Name
+
+                                </th>
+
+                                <th width="220">
+
+                                    Actions
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for category in categories %}
+
+                                <tr>
+
+                                    <td>
+
+                                        {{ category.id }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ category.name }}
+
+                                    </td>
+
+                                    <td>
+
+                                        <!-- EDIT -->
+                                        <a
+                                            href="{{ url_for('admin.edit_category', id=category.id) }}"
+                                            class="btn btn-warning btn-sm"
+                                        >
+
+                                            <i class="fa fa-edit"></i>
+
+                                            Edit
+
+                                        </a>
+
+
+                                        <!-- DELETE -->
+                                        <a
+                                            href="{{ url_for('admin.delete_category', id=category.id) }}"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure to delete this category?')"
+                                        >
+
+                                            <i class="fa fa-trash"></i>
+
+                                            Delete
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    No Categories Found
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

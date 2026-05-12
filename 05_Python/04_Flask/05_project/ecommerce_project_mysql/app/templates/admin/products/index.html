@@ -1,0 +1,215 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Products
+{% endblock %}
+
+{% block page_title %}
+All Products
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- TOP BUTTON -->
+    <div class="mb-3">
+
+        <a
+            href="{{ url_for('admin.create_product') }}"
+            class="btn btn-dark"
+        >
+
+            <i class="fa fa-plus"></i>
+
+            Add Product
+
+        </a>
+
+    </div>
+
+
+    <!-- PRODUCT TABLE -->
+    <div class="card card-box">
+
+        <div class="card-header bg-dark text-white">
+
+            <h5>
+
+                Product List
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            {% if products %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>
+
+                                    ID
+
+                                </th>
+
+                                <th>
+
+                                    Image
+
+                                </th>
+
+                                <th>
+
+                                    Product Name
+
+                                </th>
+
+                                <th>
+
+                                    Price
+
+                                </th>
+
+                                <th>
+
+                                    Stock
+
+                                </th>
+
+                                <th>
+
+                                    Category
+
+                                </th>
+
+                                <th width="220">
+
+                                    Actions
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for product in products %}
+
+                                <tr>
+
+                                    <td>
+
+                                        {{ product.id }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {% if product.image %}
+
+                                            <img
+                                                src="{{ url_for('static', filename='images/' + product.image) }}"
+                                                width="70"
+                                                height="70"
+                                                style="object-fit: cover;"
+                                                class="rounded"
+                                            >
+
+                                        {% else %}
+
+                                            No Image
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ product.name }}
+
+                                    </td>
+
+                                    <td>
+
+                                        ₹ {{ product.price }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ product.stock }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ product.category.name }}
+
+                                    </td>
+
+                                    <td>
+
+                                        <!-- EDIT -->
+                                        <a
+                                            href="{{ url_for('admin.edit_product', id=product.id) }}"
+                                            class="btn btn-warning btn-sm"
+                                        >
+
+                                            <i class="fa fa-edit"></i>
+
+                                            Edit
+
+                                        </a>
+
+
+                                        <!-- DELETE -->
+                                        <a
+                                            href="{{ url_for('admin.delete_product', id=product.id) }}"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Are you sure to delete this product?')"
+                                        >
+
+                                            <i class="fa fa-trash"></i>
+
+                                            Delete
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    No Products Found
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Edit Category
+{% endblock %}
+
+{% block page_title %}
+Edit Category
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card card-box">
+
+                <div class="card-header bg-warning text-dark">
+
+                    <h5>
+
+                        Edit Category
+
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <!-- EDIT FORM -->
+                    <form method="POST">
+
+                        <!-- CATEGORY NAME -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Category Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                value="{{ category.name }}"
+                                required
+                            >
+
+                        </div>
+
+                        <!-- UPDATE BUTTON -->
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-warning"
+                            >
+
+                                <i class="fa fa-edit"></i>
+
+                                Update Category
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="card-footer text-center">
+
+                    <a
+                        href="{{ url_for('admin.categories') }}"
+                        class="btn btn-secondary"
+                    >
+
+                        <i class="fa fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

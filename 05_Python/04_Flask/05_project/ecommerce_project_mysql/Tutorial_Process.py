@@ -7,4 +7,6 @@
     6. pip freeze > requirements.txt
     7. pip install pillow
     8. pip install flask-jwt-extended
+    9. pip install cryptography
+    9. python run.py
 '''

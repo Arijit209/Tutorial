@@ -6,21 +6,19 @@ Checkout
 
 {% block content %}
 
-<h2 class="mb-4">
-    Checkout 🛍
-</h2>
-
 <div class="row">
 
-    <!-- ADDRESS -->
-    <div class="col-md-7">
+    <!-- CHECKOUT FORM -->
+    <div class="col-md-7 mb-4">
 
-        <div class="card shadow">
+        <div class="card shadow border-0">
 
             <div class="card-header bg-dark text-white">
 
                 <h4>
-                    Shipping Address
+
+                    Checkout
+
                 </h4>
 
             </div>
@@ -29,25 +27,134 @@ Checkout
 
                 <form method="POST">
 
+                    <!-- FULL NAME -->
                     <div class="mb-3">
 
-                        <label>
-                            Delivery Address
+                        <label class="form-label">
+
+                            Full Name
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            class="form-control"
+                            value="{{ customer.name }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Email
+
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            class="form-control"
+                            value="{{ customer.email }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- PHONE -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Phone Number
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            class="form-control"
+                            placeholder="Enter Phone Number"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Shipping Address
+
                         </label>
 
                         <textarea
                             name="address"
-                            rows="5"
+                            rows="4"
                             class="form-control"
+                            placeholder="Enter Full Address"
                             required
                         ></textarea>
 
                     </div>
 
+
+                    <!-- PAYMENT METHOD -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Payment Method
+
+                        </label>
+
+                        <select
+                            name="payment_method"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="COD">
+
+                                Cash On Delivery
+
+                            </option>
+
+                            <option value="UPI">
+
+                                UPI
+
+                            </option>
+
+                            <option value="CARD">
+
+                                Debit / Credit Card
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SUBMIT -->
                     <button
-                        class="btn btn-success"
+                        type="submit"
+                        class="btn btn-success w-100"
                     >
+
+                        <i class="fa fa-check"></i>
+
                         Place Order
+
                     </button>
 
                 </form>
@@ -58,86 +165,115 @@ Checkout
 
     </div>
 
+
     <!-- ORDER SUMMARY -->
     <div class="col-md-5">
 
-        <div class="card shadow">
+        <div class="card shadow border-0">
 
             <div class="card-header bg-primary text-white">
 
                 <h4>
+
                     Order Summary
+
                 </h4>
 
             </div>
 
             <div class="card-body">
 
-                {% for item in cart_items.values() %}
+                {% for item in cart_items %}
 
-                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-3">
 
-                    <h5>
+                        <div>
 
-                        {{ item.name }}
+                            <strong>
 
-                    </h5>
+                                {{ item.product.name }}
 
-                    <p>
+                            </strong>
 
-                        ₹ {{ item.price }}
-                        ×
-                        {{ item.quantity }}
+                            <br>
 
-                    </p>
+                            <small>
 
-                </div>
+                                Qty :
 
-                <hr>
+                                {{ item.quantity }}
+
+                            </small>
+
+                        </div>
+
+                        <div>
+
+                            ₹ {{ item.total }}
+
+                        </div>
+
+                    </div>
 
                 {% endfor %}
 
-                <div class="d-flex justify-content-between">
 
-                    <h5>
+                <hr>
+
+
+                <!-- SUBTOTAL -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <strong>
+
                         Subtotal
-                    </h5>
 
-                    <h5>
+                    </strong>
+
+                    <span>
+
                         ₹ {{ subtotal }}
-                    </h5>
+
+                    </span>
 
                 </div>
 
+
+                <!-- GST -->
+                <div class="d-flex justify-content-between mb-2">
+
+                    <strong>
+
+                        GST (18%)
+
+                    </strong>
+
+                    <span>
+
+                        ₹ {{ total_gst }}
+
+                    </span>
+
+                </div>
+
+
                 <hr>
 
+
+                <!-- GRAND TOTAL -->
                 <div class="d-flex justify-content-between">
 
                     <h5>
-                        GST (18%)
-                    </h5>
 
-                    <h5 class="text-warning">
-
-                        ₹ {{ gst }}
+                        Grand Total
 
                     </h5>
 
-                </div>
+                    <h5 class="text-success">
 
-                <hr>
+                        ₹ {{ grand_total }}
 
-                <div class="d-flex justify-content-between">
-
-                    <h4>
-                        Total Amount
-                    </h4>
-
-                    <h4 class="text-success">
-
-                        ₹ {{ final_total }}
-
-                    </h4>
+                    </h5>
 
                 </div>
 
