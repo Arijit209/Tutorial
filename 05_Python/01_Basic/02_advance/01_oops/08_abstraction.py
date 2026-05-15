@@ -1,5 +1,6 @@
 '''
-    abstraction in not working in python
+    abstraction is the process of hiding the implementation details and showing only functionality to the user.
+    It allows us to focus on what the object does instead of how it does it.
 '''
 from abc import ABC, abstractmethod
 
@@ -28,3 +29,6 @@ class Circle(abstract):
         print('This is area')
 
 obj = Circle(7)
+print(obj.radius)
+obj.perimeter()
+obj.area()

@@ -1,6 +1,6 @@
 '''
 mutable             -> changing the value, not index key change
-duplicates          -> use duplicate values but ndex not change
+duplicates          -> use duplicate values but index not change
 insertion-ordered   -> maintain the sequesnce element, cannot access with index value
 hetrogenous         -> multiple datatype save into the list [string, numbers, list, dictionary]
 note : create in curly bracket, must have key and value pair into the curly bracket

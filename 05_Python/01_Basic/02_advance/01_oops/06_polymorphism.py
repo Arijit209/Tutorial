@@ -1,8 +1,8 @@
 '''
     It allows the same interface or method name behafe differently depending on the object or context
-    -Method Overriding
+    -Method Overriding 
     -Method Overloading (not exist in python)(same method name but different arguments)
-    -Duck Typing
+    -Duck Typing 
 '''
 ##Method Overriding
 # class Animal:

@@ -46,7 +46,6 @@ def updateFile():
             print('press 1 for changing the name of the file')
             print('press 2 for overwriting the data of the file')
             print('press 3 for appending some content of the file')
-
             res = int(input(f'Tell you response: '))
             if res == 1:
                 name2 = input(f'Tell your new file name: ')
